@@ -1,7 +1,12 @@
 on fs
+    chmod 0660 /dev/qseecom
+    chown system drmrpc /dev/qseecom
+    chmod 0664 /dev/ion
+    chown system system /dev/ion
+
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 2A47
-    write /sys/class/android_usb/android0/idProduct 7F10
+    write /sys/class/android_usb/android0/idProduct 9039
     write /sys/class/android_usb/android0/f_ffs/aliases adb
     write /sys/class/android_usb/android0/functions mtp,adb
     write /sys/class/android_usb/android0/iManufacturer ${ro.product.manufacturer}
@@ -29,12 +34,7 @@ on property:sys.usb.config=adb
     write /sys/class/android_usb/android0/enable ${service.adb.root}
     start adbd
 
-on init
-    write /sys/devices/soc.0/78b9000.i2c/i2c-5/5-004a/plugin "pl enable 6"
-    write /sys/devices/soc.0/78b9000.i2c/i2c-5/5-004a/gesture_list "TAP 1;"
-    write /sys/devices/soc.0/78b9000.i2c/i2c-5/5-004a/en_gesture 1
-
-service sbinqseecomd /sbin/qseecomd.sh
+service sbinqseecomd /sbin/qseecomd
     oneshot
     disabled
     user root
@@ -43,3 +43,8 @@ service sbinqseecomd /sbin/qseecomd.sh
 
 on property:ro.crypto.state=encrypted
     start sbinqseecomd
+
+on init
+    write /sys/bus/i2c/devices/5-004a/plugin "pl enable 6"
+    write /sys/bus/i2c/devices/5-004a/gesture_list "TAP 1;"
+    write /sys/bus/i2c/devices/5-004a/en_gesture 1
